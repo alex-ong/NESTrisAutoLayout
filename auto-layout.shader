@@ -183,7 +183,42 @@ float4 renderLevelSelect(float2 uv)
 
 float4 renderTitle(float2 uv)
 {
-
+    if (inField(uv)) {
+        float2 perc = invLerp2(top_left_f(), bot_right_f(), uv);
+        if (perc.y < 0.2) return float4(0.0,0.0,0.0,1.0);
+        
+        if (perc.y < 0.7) {
+            float2 adj = float2(uv.x,uv.y);
+            adj.x = adj.x + 7 *blockWidth();
+            adj.y = adj.y + 6 * blockHeight();
+            
+            if (perc.x >= 0.9) return float4(0.0,0.0,0.0,1.0);
+            if (perc.y >= 0.6) return float4(0.0,0.0,0.0,1.0);
+            if (perc.x >= 0.8 && perc.y < 0.3) return float4(0.0,0.0,0.0,1.0);
+            return image.Sample(textureSampler, adj);
+        } else if (perc.y < 0.8){
+            float2 adj = float2(uv.x,uv.y);
+            adj.x = adj.x - 5.0*blockWidth();
+            adj.y = adj.y; //*blockHeight();
+            
+            return image.Sample(textureSampler,adj);
+        } else if (perc.y < 0.845) {
+            float2 adj = float2(uv.x,uv.y);
+            adj.x = adj.x - 8.0*blockWidth();
+            adj.y = adj.y; //*blockHeight();
+            if (perc.x > 0.7) return float4(0.0,0.0,0.0,1.0);            
+            return image.Sample(textureSampler,adj);
+        } else if (perc.y < 0.9) {
+            float2 adj = float2(uv.x,uv.y);
+            adj.x = adj.x - 2 * blockWidth();
+            adj.y = adj.y - 1 * blockHeight();
+            if (perc.x < 0.2) return float4(0.0,0.0,0.0,1.0);
+            return image.Sample(textureSampler,adj);
+        }
+        
+    } 
+    
+    return reddify(image.Sample(textureSampler,uv));
 }
 
 float4 mainImage(VertData v_in) : TARGET
