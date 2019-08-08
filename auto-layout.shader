@@ -160,6 +160,55 @@ float4 reddify(float4 as)
     return (as + float4(1.0,0.0,0.0,1.0))/2.0;
 }
 
+float4 renderRocket(float2 uv)
+{
+    if (inField(uv)) {
+        float2 perc = invLerp2(top_left_f(), bot_right_f(), uv);
+        if (perc.y < 0.20) {
+            float2 adj = float2(uv.x,uv.y);
+            adj.x = adj.x - 0*blockWidth();
+            adj.y = adj.y - 4*blockHeight();
+            return image.Sample(textureSampler, adj);        
+        } else {
+            float2 adj = float2(uv.x,uv.y);
+            adj.x = adj.x + 7*blockWidth();
+            adj.y = adj.y + 1*blockHeight();
+            return image.Sample(textureSampler,adj);
+        }        
+    } 
+    
+    return float4(0.0,0.0,0.0,1.0);
+   
+}
+
+float4 renderMusic(float2 uv)
+{
+    if (inField(uv)) {
+        float2 perc = invLerp2(top_left_f(), bot_right_f(), uv);
+        if (perc.y < 0.05) {
+            return float4(0.0,0.0,0.0,1.0);
+        } else if (perc.y < 0.20) {
+            float2 adj = float2(uv.x,uv.y);
+            adj.x = adj.x - 5*blockWidth();
+            return image.Sample(textureSampler, adj);
+        } else if (perc.y < 0.35) {            
+            float2 adj = float2(uv.x,uv.y);
+            adj.x = adj.x + 7 * blockWidth();
+            adj.y = adj.y - 3 * blockHeight();
+            return image.Sample(textureSampler, adj);
+        } else if (perc.y > 0.6){
+            float2 adj = float2(uv.x,uv.y);
+            adj.x = adj.x + 1*blockWidth();
+            adj.y = adj.y;
+            return image.Sample(textureSampler,adj);
+        }
+        
+    } 
+    
+    return float4(0.0,0.0,0.0,1.0);
+   
+}
+
 float4 renderLevelSelect(float2 uv)
 {
     if (inField(uv)) {
@@ -196,7 +245,7 @@ float4 renderTitle(float2 uv)
             if (perc.y >= 0.6) return float4(0.0,0.0,0.0,1.0);
             if (perc.x >= 0.8 && perc.y < 0.3) return float4(0.0,0.0,0.0,1.0);
             return image.Sample(textureSampler, adj);
-        } else if (perc.y < 0.8){
+        } else if (perc.y < 0.75){
             float2 adj = float2(uv.x,uv.y);
             adj.x = adj.x - 5.0*blockWidth();
             adj.y = adj.y; //*blockHeight();
@@ -208,7 +257,7 @@ float4 renderTitle(float2 uv)
             adj.y = adj.y; //*blockHeight();
             if (perc.x > 0.7) return float4(0.0,0.0,0.0,1.0);            
             return image.Sample(textureSampler,adj);
-        } else if (perc.y < 0.9) {
+        } else if (perc.y < 0.895) {
             float2 adj = float2(uv.x,uv.y);
             adj.x = adj.x - 2 * blockWidth();
             adj.y = adj.y - 1 * blockHeight();
@@ -218,7 +267,7 @@ float4 renderTitle(float2 uv)
         
     } 
     
-    return reddify(image.Sample(textureSampler,uv));
+    return float4(0.0,0.0,0.0,1.0);
 }
 
 float4 mainImage(VertData v_in) : TARGET
@@ -243,19 +292,18 @@ float4 mainImage(VertData v_in) : TARGET
         return renderTitle(uv);        
     } else if (isGrey(r) && isGrey(g) && isBlack(b)) { //level-select
         return renderLevelSelect(uv);
-    } else if (isBlack(r) && isBlack(g) && isBlack(b)) { //credits
+    } else if (isBlack(r) && isBlack(g) && isBlack(b)) { //credits and pause
         //return float4(0.0,0.0,1.0,1.0); //blue
     } else if (isBlue(g) && isBlue(b)) {//rocket         
-        //return float4(1.0,1.0,0.0,1.0); //yellow
+        return renderRocket(uv);
     } else if (isGrey(r)) { //music
-        //return float4(0.0,1.0,1.0,1.0); //teal
+        return renderMusic(uv);
     } else { //fallback
         //return image.Sample(textureSampler, v_in.uv);
     }
     
     if (inField(uv)) {       
-        return (float4(1.0,1.0,1.0,1.0) + orig) / 2.0;
-        
+        return (float4(1.0,1.0,1.0,1.0) + orig) / 2.0;        
     }
     
     
