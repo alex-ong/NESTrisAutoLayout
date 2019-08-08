@@ -167,7 +167,8 @@ float4 renderRocket(float2 uv)
         if (perc.y < 0.20) {
             float2 adj = float2(uv.x,uv.y);
             adj.x = adj.x - 0*blockWidth();
-            adj.y = adj.y - 4*blockHeight();
+            adj.y = adj.y - 4*blockHeight();            
+            if (perc.x > 0.8) adj.x = adj.x - 8*blockWidth();
             return image.Sample(textureSampler, adj);        
         } else {
             float2 adj = float2(uv.x,uv.y);
