@@ -1,36 +1,29 @@
 uniform bool setup_mode = true;
-uniform float field_left_x = 96;
-uniform float field_right_x = 176;
-uniform float field_top_y = 43;
-uniform float field_bottom_y = 196;
-
-//B
-uniform float game_black_x1 = 98;
-uniform float game_black_y1 = 20;
-
-//G
-uniform float game_black_x2 = 236;
-uniform float game_black_y2 = 18;
-
-//R
-uniform float game_grey_x1 = 36;
-uniform float game_grey_y1 = 220;
-
-//O
-uniform float blue_corner_x = 27;
-uniform float blue_corner_y = 20;
-
-uniform bool setup_mode = true;
 uniform float field_left_x = 61.2;
 uniform float field_right_x = 113;
 uniform float field_top_y = 40;
 uniform float field_bottom_y = 200;
 
-uniform float always_x1 = 0;
-uniform float always_y1 = 0;
-uniform float always_x2 = 0;
-uniform float always_y2 = 0;
+//B
+uniform float game_black_x1 = 63;
+uniform float game_black_y1 = 20;
 
+//G
+uniform float game_black_x2 = 151.5;
+uniform float game_black_y2 = 20;
+
+//R
+uniform float game_grey_x1 = 23.5;
+uniform float game_grey_y1 = 220;
+
+//O
+uniform float blue_corner_x = 18;
+uniform float blue_corner_y = 20;
+
+uniform float always_x1 = 184;
+uniform float always_y1 = 7;
+uniform float always_x2 = 237;
+uniform float always_y2 = 68;
 float2 top_left_f()
 {
     return float2(field_left_x / 256.0, field_top_y / 224.0);
