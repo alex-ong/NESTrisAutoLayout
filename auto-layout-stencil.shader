@@ -442,11 +442,6 @@ float4 mainImage(VertData v_in) : TARGET
         //return image.Sample(textureSampler, v_in.uv);
     }
     
-    if (inField(uv)) {       
-        return (float4(1.0,1.0,1.0,1.0) + orig) / 2.0;        
-    }
-    
-    
-    return image.Sample(textureSampler, v_in.uv);
+    return image.Sample(textureSampler, uv);
 	
 }
