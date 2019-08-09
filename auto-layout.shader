@@ -4,12 +4,21 @@ uniform float field_right_x = 176;
 uniform float field_top_y = 43;
 uniform float field_bottom_y = 196;
 
+//B
 uniform float game_black_x1 = 98;
-uniform float game_black_y1 = 26;
-uniform float game_black_x2 = 240;
-uniform float game_black_y2 = 24;
+uniform float game_black_y1 = 20;
+
+//G
+uniform float game_black_x2 = 236;
+uniform float game_black_y2 = 18;
+
+//R
 uniform float game_grey_x1 = 36;
-uniform float game_grey_y1 = 214;
+uniform float game_grey_y1 = 220;
+
+//O
+uniform float blue_corner_x = 27;
+uniform float blue_corner_y = 20;
 
 float2 top_left_f()
 {
@@ -24,6 +33,13 @@ float2 bot_right_f()
 float myLerp(float start, float end, float perc)
 {
     return start + (end-start) * perc;
+}
+
+float2 myLerp2(float2 start, float2 end, float2 perc)
+{
+    float x = myLerp(start.x,end.x, perc.x);
+    float y = myLerp(start.y,end.y, perc.y);   
+    return float2(x,y);
 }
 
 float invLerp(float start, float end, float num)
@@ -89,10 +105,12 @@ float4 pixBox(float2 uv, int pixels)
 float2 gameBlack1_uv() { return float2(game_black_x1 / 256.0, game_black_y1 / 224.0); }
 float2 gameBlack2_uv() { return float2(game_black_x2 / 256.0, game_black_y2 / 224.0); }
 float2 gameGrey1_uv() { return float2(game_grey_x1 / 256.0, game_grey_y1 / 224.0); }
+float2 blueCorner_uv() { return float2(blue_corner_x / 256.0, blue_corner_y / 224.0); }
 
 float4 gameBlack1_box(){ return pixBox(gameBlack1_uv(), 2);}
 float4 gameBlack2_box(){ return pixBox(gameBlack2_uv(), 2);}
 float4 gameGrey1_box() { return pixBox(gameGrey1_uv(), 2);}
+float4 blueCorner_box() { return pixBox(blueCorner_uv(), 2);}
 
 bool isBlack(float4 rgba) {
 	float limit = 0.15;
@@ -111,8 +129,13 @@ bool isGrey(float4 rgba) {
 
 bool isBlue(float4 rgba)
 {
-    float limit = 0.25;
-    return rgba.b >= 1.0 - limit && rgba.r <= limit && rgba.g <= limit;
+    float limitr = 0.4;
+    float limitb = 0.1;    
+    float limitg = 0.1;
+
+    return (rgba.r <= limitr && 
+           rgba.g <= 1.0 - limitg &&
+           rgba.b >= 1.0 - limitb);
 }
 
 //Simple 4 sample of centre of 3x3 block
@@ -145,9 +168,11 @@ float4 setupDraw(float2 uv)
     if (inBox2(uv, gameBlack1_box())) {
         return float4(0.0,0.0,1.0,1.0);
     } else if (inBox2(uv, gameBlack2_box())) {
-        return float4(0.0,0.0,1.0,1.0);
+        return float4(0.0,1.0,0.0,1.0);
     } else if (inBox2(uv, gameGrey1_box())) {
-        return float4(0.0,0.0,1.0,1.0);
+        return float4(1.0,0.0,0.0,1.0);
+    } else if (inBox2(uv, blueCorner_box())) {
+        return float4(1.0,0.7,0.0,1.0);
     }
    
 		
@@ -210,6 +235,50 @@ float4 renderMusic(float2 uv)
    
 }
 
+float4 renderHighScore(float2 uv)
+{
+
+    if (inField(uv)) {
+        float2 perc = invLerp2(top_left_f(), bot_right_f(), uv);
+        if (perc.y < 0.1) {
+            return float4(0.0,0.0,0.0,1.0);
+        } else if (perc.y < 0.20) {
+            float2 adj = float2(uv.x,uv.y);
+            adj.x = adj.x - 1.5*blockWidth();
+            adj.y = adj.y + 2*blockWidth();
+            return image.Sample(textureSampler, adj);
+        } else if (perc.y < 0.30) {
+            float2 adj = float2(uv.x,uv.y);
+            adj.x = adj.x - 5*blockWidth();
+            adj.y = adj.y + 2*blockWidth();
+            if (perc.x > 0.8) {
+                return float4(0.0,0.0,0.0,1.0);
+            }
+            return image.Sample(textureSampler, adj);
+        } else if (perc.y < 0.40) {
+            float2 adj = float2(uv.x,uv.y);
+            adj.x = adj.x + 2*blockWidth();
+            adj.y = adj.y + 0*blockWidth();
+            if (0.2 <= perc.x && perc.x <= 0.8) {
+                return image.Sample(textureSampler, adj);
+            } else {
+                return float4(0.0,0.0,0.0,1.0);
+            }
+        } else if (perc.y < 0.55) {
+            return float4(0.0,0.0,0.0,1.0);
+        } else {
+            float2 adj = float2(uv.x,uv.y);
+            adj.x = adj.x + 3.5*blockWidth();
+            adj.y = adj.y - 0.65*blockHeight();
+            return image.Sample(textureSampler,adj);
+        }
+        
+    } 
+
+    
+    return float4(0.0,0.0,0.0,1.0);
+   
+}
 float4 renderLevelSelect(float2 uv)
 {
     if (inField(uv)) {
@@ -271,6 +340,41 @@ float4 renderTitle(float2 uv)
     return float4(0.0,0.0,0.0,1.0);
 }
 
+float4 renderCredits(float2 uv)
+{
+    if (inField(uv)) {
+        float2 perc = invLerp2(top_left_f(), bot_right_f(), uv);
+        if (perc.y < 0.4) { 
+            return float4(0.0,0.0,0.0,1.0);        
+        } else if (perc.y < 0.5) { 
+            float2 adj = float2(uv.x,uv.y);
+            adj.x = adj.x - 11 * blockWidth();
+            adj.y = adj.y - 2 * blockHeight();
+            if (perc.x > 0.8) return float4(0.0,0.0,0.0,1.0);
+            float4 col = image.Sample(textureSampler, adj); 
+            float greyscale = 0.2126 *col.r + 0.7152 *col.g + 0.0722 *col.b;
+            return float4(greyscale,greyscale,greyscale,1.0);            
+        } else if (perc.y < 0.8) {
+            return float4(0.0,0.0,0.0,1.0);
+        } else if (perc.y < 0.85) {
+            float2 adj = float2(uv.x,uv.y);
+            adj.x = adj.x - 7 * blockWidth();
+            adj.y = adj.y - 8 * blockHeight();
+            if (perc.x > 0.8) return float4(0.0,0.0,0.0,1.0);
+            return image.Sample(textureSampler,adj);
+        } else if (perc.y < 0.9) {
+            float2 adj = float2(uv.x,uv.y);
+            adj.x = adj.x + 1 * blockWidth();
+            adj.y = adj.y - 9 * blockHeight();
+            return image.Sample(textureSampler,adj);
+        } 
+    } 
+    
+    return float4(0.0,0.0,0.0,1.0);
+    
+    
+}
+
 float4 mainImage(VertData v_in) : TARGET
 {	
 	float2 uv = v_in.uv;
@@ -291,10 +395,24 @@ float4 mainImage(VertData v_in) : TARGET
         return image.Sample(textureSampler, v_in.uv);
     } else if (isBlack(r) && isGrey(g) && isGrey(b)) { //title screen
         return renderTitle(uv);        
-    } else if (isGrey(r) && isGrey(g) && isBlack(b)) { //level-select
-        return renderLevelSelect(uv);
+    } else if (isGrey(r) && isGrey(g) && isBlack(b)) { //level-select / high-score
+        float4 o = sampleBlock(blueCorner_uv(), pixelSize);
+        if (isBlue(o)) {
+            return renderHighScore(uv);
+        } else {
+            return renderLevelSelect(uv);
+        }
     } else if (isBlack(r) && isBlack(g) && isBlack(b)) { //credits and pause
-        //return float4(0.0,0.0,1.0,1.0); //blue
+        float2 a = float2(0.55,0.475);
+        float2 pauseUV = myLerp2(top_left_f(),bot_right_f(), a);
+        float4 centreCol = sampleBlock(pauseUV, pixelSize);
+        
+        if (isBlack(centreCol)) //credits
+        {
+            return renderCredits(uv);            
+        } else {
+            return orig;
+        }
     } else if (isBlue(g) && isBlue(b)) {//rocket         
         return renderRocket(uv);
     } else if (isGrey(r)) { //music
