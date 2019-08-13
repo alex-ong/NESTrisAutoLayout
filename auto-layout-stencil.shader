@@ -4,26 +4,27 @@ uniform float field_right_x = 113;
 uniform float field_top_y = 40;
 uniform float field_bottom_y = 200;
 
-//B
-uniform float game_black_x1 = 63;
-uniform float game_black_y1 = 20;
+//Blue
+uniform float blue_spot_x = 63;
+uniform float blue_spot_y = 20;
 
-//G
-uniform float game_black_x2 = 151.5;
-uniform float game_black_y2 = 20;
+//Green
+uniform float green_spot_x = 151.5;
+uniform float green_spot_y = 20;
 
-//R
-uniform float game_grey_x1 = 23.5;
-uniform float game_grey_y1 = 220;
+//Red
+uniform float red_spot_x = 23.5;
+uniform float red_spot_y = 220;
 
-//O
-uniform float blue_corner_x = 18;
-uniform float blue_corner_y = 20;
+//Orange
+uniform float orange_spot_x = 18;
+uniform float orange_spot_y = 20;
 
 uniform float always_x1 = 184;
 uniform float always_y1 = 7;
 uniform float always_x2 = 237;
 uniform float always_y2 = 68;
+
 float2 top_left_f()
 {
     return float2(field_left_x / 256.0, field_top_y / 224.0);
@@ -106,17 +107,19 @@ float4 pixBox(float2 uv, int pixels)
 				  uv.y - (pixels / 224.0), uv.y + (pixels/224.0));
 }
 
-float2 gameBlack1_uv() { return float2(game_black_x1 / 256.0, game_black_y1 / 224.0); }
-float2 gameBlack2_uv() { return float2(game_black_x2 / 256.0, game_black_y2 / 224.0); }
-float2 gameGrey1_uv() { return float2(game_grey_x1 / 256.0, game_grey_y1 / 224.0); }
-float2 blueCorner_uv() { return float2(blue_corner_x / 256.0, blue_corner_y / 224.0); }
+float2 blue_uv() { return float2(blue_spot_x / 256.0, blue_spot_y / 224.0); }
+float2 green_uv() { return float2(green_spot_x / 256.0, green_spot_y / 224.0); }
+float2 red_uv() { return float2(red_spot_x / 256.0, red_spot_y / 224.0); }
+float2 orange_uv() { return float2(orange_spot_x / 256.0, orange_spot_y / 224.0); }
 
-float4 gameBlack1_box(){ return pixBox(gameBlack1_uv(), 2);}
-float4 gameBlack2_box(){ return pixBox(gameBlack2_uv(), 2);}
-float4 gameGrey1_box() { return pixBox(gameGrey1_uv(), 2);}
-float4 blueCorner_box() { return pixBox(blueCorner_uv(), 2);}
-float4 always_box() { return float4(always_x1 / 256.0,always_x2 / 256.0,
-									always_y1 / 224.0,always_y2 / 224.0); }
+float4 blue_box() { return pixBox(blue_uv(), 2); }
+float4 green_box() { return pixBox(green_uv(), 2); }
+float4 red_box() { return pixBox(red_uv(), 2); }
+float4 orange_box() { return pixBox(orange_uv(), 2); }
+float4 always_box() {
+	return float4(always_x1 / 256.0, always_x2 / 256.0,
+		always_y1 / 224.0, always_y2 / 224.0);
+}
 bool isBlack(float4 rgba) {
 	float limit = 0.15;
 	return (rgba.r <= limit &&
@@ -178,13 +181,13 @@ float4 setupDraw(float2 uv)
 	} 
 	
 	
-    if (inBox2(uv, gameBlack1_box())) {
+    if (inBox2(uv, blue_box())) {
         return float4(0.0,0.0,1.0,1.0);
-    } else if (inBox2(uv, gameBlack2_box())) {
+    } else if (inBox2(uv, green_box())) {
         return float4(0.0,1.0,0.0,1.0);
-    } else if (inBox2(uv, gameGrey1_box())) {
+    } else if (inBox2(uv, red_box())) {
         return float4(1.0,0.0,0.0,1.0);
-    } else if (inBox2(uv, blueCorner_box())) {
+    } else if (inBox2(uv, orange_box())) {
         return float4(1.0,0.7,0.0,1.0);
     }
    
@@ -400,9 +403,9 @@ float4 mainImage(VertData v_in) : TARGET
 	} 
 	
 	
-    float4 r = sampleBlock(gameGrey1_uv(), pixelSize);
-    float4 g = sampleBlock(gameBlack2_uv(), pixelSize);
-    float4 b = sampleBlock(gameBlack1_uv(), pixelSize);
+    float4 r = sampleBlock(red_uv(), pixelSize);
+    float4 g = sampleBlock(green_uv(), pixelSize);
+    float4 b = sampleBlock(blue_uv(), pixelSize);
 	
     float4 orig = image.Sample(textureSampler, v_in.uv);
     
@@ -417,7 +420,7 @@ float4 mainImage(VertData v_in) : TARGET
     } else if (isBlack(r) && isGrey(g) && isGrey(b)) { //title screen
         return renderTitle(uv);        
     } else if (isGrey(r) && isGrey(g) && isBlack(b)) { //level-select / high-score
-        float4 o = sampleBlock(blueCorner_uv(), pixelSize);
+        float4 o = sampleBlock(orange_box(), pixelSize);
         if (isBlue(o)) {
             return renderHighScore(uv);
         } else {
