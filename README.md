@@ -19,7 +19,11 @@ The Red/Green/Blue points are fairly lenient, however the Orange point needs to 
 of the red border in the level select screen; this lets us determine whether we are in high-score input or level select.
 
 Title screen
+
 ![one](https://raw.githubusercontent.com/alex-ong/NESTrisAutoLayout/master/Markers.png)
 
+
 Level Select
+
+
 ![two](https://raw.githubusercontent.com/alex-ong/NESTrisAutoLayout/master/markers2.png)
