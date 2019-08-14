@@ -150,12 +150,17 @@ bool isWhite(float4 rgba)
 bool isBlue(float4 rgba)
 {
     float limitr = 0.4;
-    float limitb = 0.2;    
-    float limitg = 0.2;
+    float limitb = 0.3;    
+    float limitg = 0.3;
 
     return (rgba.r <= limitr && 
            rgba.g <= 1.0 - limitg &&
            rgba.b >= 1.0 - limitb);
+}
+
+bool isBlueNotRed(float4 rgba)
+{
+	return rgba.b > rgba.r;
 }
 
 //Simple 4 sample of centre of 3x3 block
@@ -425,7 +430,7 @@ float4 mainImage(VertData v_in) : TARGET
         return renderTitle(uv);        
     } else if (isGrey(r) && isGrey(g) && isBlack(b)) { //level-select / high-score
         float4 o = sampleBlock(orange_uv(), pixelSize);
-        if (isBlue(o)) {
+        if (isBlueNotRed(o)) {
             return renderHighScore(uv);
         } else {
             return renderLevelSelect(uv);
