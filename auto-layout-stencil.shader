@@ -287,13 +287,28 @@ float4 renderHighScore(float2 uv)
             } else {
                 return float4(0.0,0.0,0.0,1.0);
             }
-        } else if (perc.y < 0.55) {
+        } else if (perc.y < 0.5) {
             return float4(0.0,0.0,0.0,1.0);
-        } else {
+        } else if (perc.y < 0.6) {
             float2 adj = float2(uv.x,uv.y);
             adj.x = adj.x + 3.5*blockWidth();
-            adj.y = adj.y - 0.65*blockHeight();
+            adj.y = adj.y + 1.65*blockHeight();
             return image.Sample(textureSampler,adj);
+        } else if (0.6 < perc.y && perc.y < 0.65 ||
+                   0.7 < perc.y && perc.y < 0.75 ||
+                   0.8 < perc.y && perc.y < 0.85){ //names
+            float2 adj = float2(uv.x,uv.y);
+            adj.x = adj.x + -3.25*blockWidth();
+            adj.y = adj.y + 2.0*blockHeight();
+            if (perc.x > 0.7){
+                return float4(0.0,0.0,0.0,1.0);
+            }
+            return image.Sample(textureSampler,adj);        
+        } else { //scores
+            float2 adj = float2(uv.x,uv.y);
+            adj.x = adj.x + 3.5*blockWidth();
+            adj.y = adj.y + 1.0*blockHeight();
+            return image.Sample(textureSampler,adj);               
         }
         
     } 
@@ -310,11 +325,26 @@ float4 renderLevelSelect(float2 uv)
             float2 adj = float2(uv.x,uv.y);
             adj.x = adj.x - 5.45*blockWidth();
             return image.Sample(textureSampler, adj);
-        } else {
+        } else if (perc.y < 0.6) {
             float2 adj = float2(uv.x,uv.y);
             adj.x = adj.x + 3.5*blockWidth();
-            adj.y = adj.y - 0.65*blockHeight();
+            adj.y = adj.y + 1.65*blockHeight();
             return image.Sample(textureSampler,adj);
+        } else if (0.6 < perc.y && perc.y < 0.65 ||
+                   0.7 < perc.y && perc.y < 0.75 ||
+                   0.8 < perc.y && perc.y < 0.85){ //names
+            float2 adj = float2(uv.x,uv.y);
+            adj.x = adj.x + -3.25*blockWidth();
+            adj.y = adj.y + 2.0*blockHeight();
+            if (perc.x > 0.7){
+                return float4(0.0,0.0,0.0,1.0);
+            }
+            return image.Sample(textureSampler,adj);        
+        } else { //scores
+            float2 adj = float2(uv.x,uv.y);
+            adj.x = adj.x + 3.5*blockWidth();
+            adj.y = adj.y + 1.0*blockHeight();
+            return image.Sample(textureSampler,adj);               
         }
         
     } 
