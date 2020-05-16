@@ -20,10 +20,10 @@ uniform float red_spot_y = 220;
 uniform float orange_spot_x = 18;
 uniform float orange_spot_y = 20;
 
-uniform float always_x1 = 184;
-uniform float always_y1 = 7;
-uniform float always_x2 = 237;
-uniform float always_y2 = 68;
+uniform float always_x1 = 165;
+uniform float always_y1 = 0;
+uniform float always_x2 = 256;
+uniform float always_y2 = 224;
 
 float2 top_left_f()
 {
@@ -111,15 +111,22 @@ float2 blue_uv() { return float2(blue_spot_x / 256.0, blue_spot_y / 224.0); }
 float2 green_uv() { return float2(green_spot_x / 256.0, green_spot_y / 224.0); }
 float2 red_uv() { return float2(red_spot_x / 256.0, red_spot_y / 224.0); }
 float2 orange_uv() { return float2(orange_spot_x / 256.0, orange_spot_y / 224.0); }
+float2 credits_uv() { return float2(myLerp2(top_left_f(),bot_right_f(), float2(-0.525,0.525)));}
 
 float4 blue_box() { return pixBox(blue_uv(), 2); }
 float4 green_box() { return pixBox(green_uv(), 2); }
 float4 red_box() { return pixBox(red_uv(), 2); }
 float4 orange_box() { return pixBox(orange_uv(), 2); }
+float4 credits_box() {	return pixBox(credits_uv(), 2); }
+
 float4 always_box() {
 	return float4(always_x1 / 256.0, always_x2 / 256.0,
 		always_y1 / 224.0, always_y2 / 224.0);
 }
+
+//this is in a weird spot to support stacking auto-layout
+
+
 bool isBlack(float4 rgba) {
 	float limit = 0.15;
 	return (rgba.r <= limit &&
@@ -196,10 +203,16 @@ float4 setupDraw(float2 uv)
         return float4(1.0,0.7,0.0,1.0);
     }
    
+	
+	if (inBox2(uv, credits_box()))
+	{
+		return float4(1.0,1.0,1.0,1.0) + orig;
+	}
+	
 	if (inBox2(uv, always_box())) {
 		return float4(1.0,0.0,0.0,1.0) + orig;
 	}
-	return image.Sample(textureSampler, uv);
+	return orig;
 	
 }
 
@@ -452,7 +465,7 @@ float4 mainImage(VertData v_in) : TARGET
 	
     if ((isGrey(r) || isWhite(r)) && isBlack(g) && isBlack(b)) //in game
     {
-        return image.Sample(textureSampler, v_in.uv);
+        return orig;
     } else if (isBlack(r) && isGrey(g) && isGrey(b)) { //title screen
         return renderTitle(uv);        
     } else if (isGrey(r) && isGrey(g) && isBlack(b)) { //level-select / high-score
@@ -463,15 +476,14 @@ float4 mainImage(VertData v_in) : TARGET
             return renderLevelSelect(uv);
         }
     } else if (isBlack(r) && isBlack(g) && isBlack(b)) { //credits and pause
-        float2 a = float2(0.55,0.475);
-        float2 pauseUV = myLerp2(top_left_f(),bot_right_f(), a);
-        float4 centreCol = sampleBlock(pauseUV, pixelSize);
+		//you will also end up here if you stack auto-layout       
+        float4 color = sampleBlock(credits_uv(), pixelSize);
         
-        if (isBlack(centreCol)) //credits
+        if (isBlack(color)) //pause / stacking auto-layout
         {
+			return orig;            
+        } else { // credits
             return renderCredits(uv);            
-        } else {
-            return orig;
         }
     } else if (isBlue(g) && isBlue(b)) {//rocket         
         return renderRocket(uv);
