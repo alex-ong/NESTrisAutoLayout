@@ -5,11 +5,13 @@ Change the surrounding images to fit into the field.
 1) Download and install this plugin:
 * Download: https://github.com/Oncorporation/obs-shaderfilter/releases
 * Info/Install: read this - https://github.com/Oncorporation/obs-shaderfilter (tl;dr unzip to correct place and override)
+* Alternate clarification images: https://imgur.com/a/vWVJ2Sy
 2) Download this repository by clicking this [link](https://github.com/alex-ong/NESTrisAutoLayout/archive/master.zip), and then unzipping it somewhere.
 3) Open OBS. Add your video source (i.e. NES Tetris composite AV signal, or youtube screen capture, or whatever)
-3) Add filter... (right click on video source, hit "filter")
-5) Add a new "User-defined shader"
-6) Shader Text file -> Browse -> [Either auto-layout.shader or auto-layout-stencil.shader]
+4) Create a [stencil ready scene](https://bit.ly/TheStencil)
+5) Add filter to the **scene**... (right click on video source, hit "filter")
+6) Add a new "User-defined shader"
+7) Shader Text file -> Browse -> [auto-layout-stencil.shader]
 
 
 This shader can be used to move parts of the screen around to fit into where the Field normally goes on screen.
