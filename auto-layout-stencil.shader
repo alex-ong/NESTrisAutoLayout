@@ -43,7 +43,7 @@ float myLerp(float start, float end, float perc)
 float2 myLerp2(float2 start, float2 end, float2 perc)
 {
     float x = myLerp(start.x,end.x, perc.x);
-    float y = myLerp(start.y,end.y, perc.y);   
+    float y = myLerp(start.y,end.y, perc.y);
     return float2(x,y);
 }
 
@@ -85,7 +85,7 @@ float pixelUV()
 	return float2(pixelWidthUV(),pixelHeightUV());
 }
 
-bool inField(float2 uv) {	
+bool inField(float2 uv) {
 	float startX = field_left_x / 256.0;
 	float endX = field_right_x / 256.0;
 	float startY = field_top_y / 224.0;
@@ -95,9 +95,9 @@ bool inField(float2 uv) {
 
 bool inBox2(float2 uv, float4 box)
 {
-	return (uv.x >= box.r && 
-			uv.x <= box.g && 
-			uv.y >= box.b && 
+	return (uv.x >= box.r &&
+			uv.x <= box.g &&
+			uv.y >= box.b &&
 			uv.y <= box.a);
 }
 
@@ -139,7 +139,7 @@ bool isGrey(float4 rgba) {
 	return (rgba.r >= 0.5 - limit && rgba.r <= 0.5 + limit &&
 			rgba.g >= 0.5 - limit && rgba.g <= 0.5 + limit &&
 			rgba.b >= 0.5 - limit && rgba.b <= 0.5 + limit);
-	
+
 }
 
 bool isWhite(float4 rgba)
@@ -153,10 +153,10 @@ bool isWhite(float4 rgba)
 bool isBlue(float4 rgba)
 {
     float limitr = 0.4;
-    float limitb = 0.3;    
+    float limitb = 0.3;
     float limitg = 0.3;
 
-    return (rgba.r <= limitr && 
+    return (rgba.r <= limitr &&
            rgba.g <= 1.0 - limitg &&
            rgba.b >= 1.0 - limitb);
 }
@@ -168,7 +168,7 @@ bool isBlueNotRed(float4 rgba)
 
 //Simple 4 sample of centre of 3x3 block
 float4 sampleBlock(float2 uv, float2 pixelSize)
-{	
+{
 	float4 centre = image.Sample(textureSampler, uv);
 	//float4 tl = image.Sample(textureSampler,float2(uv.x - pixelSize.x, uv.y - pixelSize.y));
 	float4 tr = image.Sample(textureSampler,float2(uv.x + pixelSize.x, uv.y - pixelSize.y));
@@ -185,14 +185,14 @@ float4 sampleBlock(float2 uv, float2 pixelSize)
 float4 setupDraw(float2 uv)
 {
 	float2 pixelSize = pixelUV();
-	
+
 	float4 orig = image.Sample(textureSampler, uv);
 	if (inField(uv))
-	{		
-		return (float4(1.0,0.0,0.0,1.0) + orig) / 2.0;	
-	} 
-	
-	
+	{
+		return (float4(1.0,0.0,0.0,1.0) + orig) / 2.0;
+	}
+
+
     if (inBox2(uv, blue_box())) {
         return float4(0.0,0.0,1.0,1.0);
     } else if (inBox2(uv, green_box())) {
@@ -202,18 +202,18 @@ float4 setupDraw(float2 uv)
     } else if (inBox2(uv, orange_box())) {
         return float4(1.0,0.7,0.0,1.0);
     }
-   
-	
+
+
 	if (inBox2(uv, credits_box()))
 	{
 		return float4(1.0,1.0,1.0,1.0) + orig;
 	}
-	
+
 	if (inBox2(uv, always_box())) {
 		return float4(1.0,0.0,0.0,1.0) + orig;
 	}
 	return orig;
-	
+
 }
 
 float4 reddify(float4 as)
@@ -228,19 +228,19 @@ float4 renderRocket(float2 uv)
         if (perc.y < 0.20) {
             float2 adj = float2(uv.x,uv.y);
             adj.x = adj.x - 0*blockWidth();
-            adj.y = adj.y - 4*blockHeight();            
+            adj.y = adj.y - 4*blockHeight();
             if (perc.x > 0.8) adj.x = adj.x - 8*blockWidth();
-            return image.Sample(textureSampler, adj);        
+            return image.Sample(textureSampler, adj);
         } else {
             float2 adj = float2(uv.x,uv.y);
             adj.x = adj.x + 7*blockWidth();
             adj.y = adj.y + 1*blockHeight();
             return image.Sample(textureSampler,adj);
-        }        
-    } 
-    
+        }
+    }
+
     return float4(0.0,0.0,0.0,1.0);
-   
+
 }
 
 float4 renderMusic(float2 uv)
@@ -253,7 +253,7 @@ float4 renderMusic(float2 uv)
             float2 adj = float2(uv.x,uv.y);
             adj.x = adj.x - 5*blockWidth();
             return image.Sample(textureSampler, adj);
-        } else if (perc.y < 0.35) {            
+        } else if (perc.y < 0.35) {
             float2 adj = float2(uv.x,uv.y);
             adj.x = adj.x + 7 * blockWidth();
             adj.y = adj.y - 3 * blockHeight();
@@ -264,11 +264,11 @@ float4 renderMusic(float2 uv)
             adj.y = adj.y;
             return image.Sample(textureSampler,adj);
         }
-        
-    } 
-    
+
+    }
+
     return float4(0.0,0.0,0.0,1.0);
-   
+
 }
 
 float4 renderHighScore(float2 uv)
@@ -316,19 +316,19 @@ float4 renderHighScore(float2 uv)
             if (perc.x > 0.7){
                 return float4(0.0,0.0,0.0,1.0);
             }
-            return image.Sample(textureSampler,adj);        
+            return image.Sample(textureSampler,adj);
         } else { //scores
             float2 adj = float2(uv.x,uv.y);
             adj.x = adj.x + 3.5*blockWidth();
             adj.y = adj.y + 1.0*blockHeight();
-            return image.Sample(textureSampler,adj);               
+            return image.Sample(textureSampler,adj);
         }
-        
-    } 
 
-    
+    }
+
+
     return float4(0.0,0.0,0.0,1.0);
-   
+
 }
 
 float4 renderLevelSelect(float2 uv)
@@ -353,18 +353,18 @@ float4 renderLevelSelect(float2 uv)
             if (perc.x > 0.7){
                 return float4(0.0,0.0,0.0,1.0);
             }
-            return image.Sample(textureSampler,adj);        
+            return image.Sample(textureSampler,adj);
         } else { //scores
             float2 adj = float2(uv.x,uv.y);
             adj.x = adj.x + 3.5*blockWidth();
             adj.y = adj.y + 1.0*blockHeight();
-            return image.Sample(textureSampler,adj);               
+            return image.Sample(textureSampler,adj);
         }
-        
-    } 
-    
+
+    }
+
     return float4(0.0,0.0,0.0,1.0);
-   
+
 }
 
 float4 renderTitle(float2 uv)
@@ -372,12 +372,12 @@ float4 renderTitle(float2 uv)
     if (inField(uv)) {
         float2 perc = invLerp2(top_left_f(), bot_right_f(), uv);
         if (perc.y < 0.2) return float4(0.0,0.0,0.0,1.0);
-        
+
         if (perc.y < 0.7) {
             float2 adj = float2(uv.x,uv.y);
             adj.x = adj.x + 7 *blockWidth();
             adj.y = adj.y + 6 * blockHeight();
-            
+
             if (perc.x >= 0.9) return float4(0.0,0.0,0.0,1.0);
             if (perc.y >= 0.6) return float4(0.0,0.0,0.0,1.0);
             if (perc.x >= 0.8 && perc.y < 0.3) return float4(0.0,0.0,0.0,1.0);
@@ -386,13 +386,13 @@ float4 renderTitle(float2 uv)
             float2 adj = float2(uv.x,uv.y);
             adj.x = adj.x - 5.0*blockWidth();
             adj.y = adj.y; //*blockHeight();
-            
+
             return image.Sample(textureSampler,adj);
         } else if (perc.y < 0.845) {
             float2 adj = float2(uv.x,uv.y);
             adj.x = adj.x - 8.0*blockWidth();
             adj.y = adj.y; //*blockHeight();
-            if (perc.x > 0.7) return float4(0.0,0.0,0.0,1.0);            
+            if (perc.x > 0.7) return float4(0.0,0.0,0.0,1.0);
             return image.Sample(textureSampler,adj);
         } else if (perc.y < 0.895) {
             float2 adj = float2(uv.x,uv.y);
@@ -401,9 +401,9 @@ float4 renderTitle(float2 uv)
             if (perc.x < 0.2) return float4(0.0,0.0,0.0,1.0);
             return image.Sample(textureSampler,adj);
         }
-        
-    } 
-    
+
+    }
+
     return float4(0.0,0.0,0.0,1.0);
 }
 
@@ -411,16 +411,16 @@ float4 renderCredits(float2 uv)
 {
     if (inField(uv)) {
         float2 perc = invLerp2(top_left_f(), bot_right_f(), uv);
-        if (perc.y < 0.4) { 
-            return float4(0.0,0.0,0.0,1.0);        
-        } else if (perc.y < 0.5) { 
+        if (perc.y < 0.4) {
+            return float4(0.0,0.0,0.0,1.0);
+        } else if (perc.y < 0.5) {
             float2 adj = float2(uv.x,uv.y);
             adj.x = adj.x - 11 * blockWidth();
             adj.y = adj.y - 2 * blockHeight();
             if (perc.x > 0.8) return float4(0.0,0.0,0.0,1.0);
-            float4 col = image.Sample(textureSampler, adj); 
+            float4 col = image.Sample(textureSampler, adj);
             float greyscale = 0.2126 *col.r + 0.7152 *col.g + 0.0722 *col.b;
-            return float4(greyscale,greyscale,greyscale,1.0);            
+            return float4(greyscale,greyscale,greyscale,1.0);
         } else if (perc.y < 0.8) {
             return float4(0.0,0.0,0.0,1.0);
         } else if (perc.y < 0.85) {
@@ -434,40 +434,40 @@ float4 renderCredits(float2 uv)
             adj.x = adj.x + 1 * blockWidth();
             adj.y = adj.y - 9 * blockHeight();
             return image.Sample(textureSampler,adj);
-        } 
-    } 
-    
+        }
+    }
+
     return float4(0.0,0.0,0.0,1.0);
-    
-    
+
+
 }
 
 float4 mainImage(VertData v_in) : TARGET
-{	
+{
 	float2 uv = v_in.uv;
 	float2 pixelSize = pixelUV();
-	
+
 	if (setup_mode) {
 		return setupDraw(uv);
-	} 
-	
-	
+	}
+
+
     float4 r = sampleBlock(red_uv(), pixelSize);
     float4 g = sampleBlock(green_uv(), pixelSize);
     float4 b = sampleBlock(blue_uv(), pixelSize);
-	
+
     float4 orig = image.Sample(textureSampler, v_in.uv);
-    
+
 	//webcam
 	if (inBox2(uv,always_box())) {
 		return orig;
 	}
-	
+
     if ((isGrey(r) || isWhite(r)) && isBlack(g) && isBlack(b)) //in game
     {
         return orig;
     } else if (isBlack(r) && isGrey(g) && isGrey(b)) { //title screen
-        return renderTitle(uv);        
+        return renderTitle(uv);
     } else if (isGrey(r) && isGrey(g) && isBlack(b)) { //level-select / high-score
         float4 o = sampleBlock(orange_box(), pixelSize);
         if (isBlueNotRed(o)) {
@@ -476,23 +476,23 @@ float4 mainImage(VertData v_in) : TARGET
             return renderLevelSelect(uv);
         }
     } else if (isBlack(r) && isBlack(g) && isBlack(b)) { //credits and pause
-		//you will also end up here if you stack auto-layout       
+		//you will also end up here if you stack auto-layout
         float4 color = sampleBlock(credits_uv(), pixelSize);
-        
+
         if (isBlack(color)) //pause / stacking auto-layout
         {
-			return orig;            
+			return orig;
         } else { // credits
-            return renderCredits(uv);            
+            return renderCredits(uv);
         }
-    } else if (isBlue(g) && isBlue(b)) {//rocket         
+    } else if (isBlue(g) && isBlue(b)) {//rocket
         return renderRocket(uv);
     } else if (isGrey(r)) { //music
         return renderMusic(uv);
     } else { //fallback
         //return image.Sample(textureSampler, v_in.uv);
     }
-    
+
     return image.Sample(textureSampler, uv);
-	
+
 }
