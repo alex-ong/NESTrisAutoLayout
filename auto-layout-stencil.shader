@@ -80,7 +80,7 @@ float pixelHeightUV()
 	return bh/8.0;
 }
 
-float pixelUV()
+float2 pixelUV()
 {
 	return float2(pixelWidthUV(),pixelHeightUV());
 }
@@ -469,7 +469,7 @@ float4 mainImage(VertData v_in) : TARGET
     } else if (isBlack(r) && isGrey(g) && isGrey(b)) { //title screen
         return renderTitle(uv);
     } else if (isGrey(r) && isGrey(g) && isBlack(b)) { //level-select / high-score
-        float4 o = sampleBlock(orange_box(), pixelSize);
+        float4 o = sampleBlock(orange_uv(), pixelSize);
         if (isBlueNotRed(o)) {
             return renderHighScore(uv);
         } else {

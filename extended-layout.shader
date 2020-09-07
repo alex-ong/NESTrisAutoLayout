@@ -88,7 +88,7 @@ float pixelHeightUV()
 	return bh/8.0;
 }
 
-float pixelUV()
+float2 pixelUV()
 {
 	return float2(pixelWidthUV(),pixelHeightUV());
 }
