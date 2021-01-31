@@ -10,7 +10,7 @@ uniform texture2d levelselect_hs;
 uniform texture2d credits_pause;
 uniform texture2d rocket;
 uniform texture2d musicSelect;
-    
+
 
 //Blue
 uniform float blue_spot_x = 63;
@@ -51,7 +51,7 @@ float myLerp(float start, float end, float perc)
 float2 myLerp2(float2 start, float2 end, float2 perc)
 {
     float x = myLerp(start.x,end.x, perc.x);
-    float y = myLerp(start.y,end.y, perc.y);   
+    float y = myLerp(start.y,end.y, perc.y);
     return float2(x,y);
 }
 
@@ -88,12 +88,12 @@ float pixelHeightUV()
 	return bh/8.0;
 }
 
-float pixelUV()
+float2 pixelUV()
 {
 	return float2(pixelWidthUV(),pixelHeightUV());
 }
 
-bool inField(float2 uv) {	
+bool inField(float2 uv) {
 	float startX = field_left_x / 256.0;
 	float endX = field_right_x / 256.0;
 	float startY = field_top_y / 224.0;
@@ -103,9 +103,9 @@ bool inField(float2 uv) {
 
 bool inBox2(float2 uv, float4 box)
 {
-	return (uv.x >= box.r && 
-			uv.x <= box.g && 
-			uv.y >= box.b && 
+	return (uv.x >= box.r &&
+			uv.x <= box.g &&
+			uv.y >= box.b &&
 			uv.y <= box.a);
 }
 
@@ -140,7 +140,7 @@ bool isGrey(float4 rgba) {
 	return (rgba.r >= 0.5 - limit && rgba.r <= 0.5 + limit &&
 			rgba.g >= 0.5 - limit && rgba.g <= 0.5 + limit &&
 			rgba.b >= 0.5 - limit && rgba.b <= 0.5 + limit);
-	
+
 }
 
 bool isWhite(float4 rgba)
@@ -154,10 +154,10 @@ bool isWhite(float4 rgba)
 bool isBlue(float4 rgba)
 {
     float limitr = 0.4;
-    float limitb = 0.3;    
+    float limitb = 0.3;
     float limitg = 0.3;
 
-    return (rgba.r <= limitr && 
+    return (rgba.r <= limitr &&
            rgba.g <= 1.0 - limitg &&
            rgba.b >= 1.0 - limitb);
 }
@@ -169,7 +169,7 @@ bool isBlueNotRed(float4 rgba)
 
 //Simple 4 sample of centre of 3x3 block
 float4 sampleBlock(float2 uv, float2 pixelSize)
-{	
+{
 	float4 centre = image.Sample(textureSampler, uv);
 	//float4 tl = image.Sample(textureSampler,float2(uv.x - pixelSize.x, uv.y - pixelSize.y));
 	float4 tr = image.Sample(textureSampler,float2(uv.x + pixelSize.x, uv.y - pixelSize.y));
@@ -186,14 +186,14 @@ float4 sampleBlock(float2 uv, float2 pixelSize)
 float4 setupDraw(float2 uv)
 {
 	float2 pixelSize = pixelUV();
-	
+
 	float4 orig = image.Sample(textureSampler, uv);
 	if (inField(uv))
-	{		
-		return (float4(1.0,0.0,0.0,1.0) + orig) / 2.0;	
-	} 
-	
-	
+	{
+		return (float4(1.0,0.0,0.0,1.0) + orig) / 2.0;
+	}
+
+
     if (inBox2(uv, blue_box())) {
         return float4(0.0,0.0,1.0,1.0);
     } else if (inBox2(uv, green_box())) {
@@ -203,12 +203,12 @@ float4 setupDraw(float2 uv)
     } else if (inBox2(uv, orange_box())) {
         return float4(1.0,0.7,0.0,1.0);
     }
-   
+
 	if (inBox2(uv, always_box())) {
 		return float4(1.0,0.0,0.0,1.0) + orig;
 	}
 	return image.Sample(textureSampler, uv);
-	
+
 }
 
 float4 reddify(float4 as)
@@ -218,28 +218,28 @@ float4 reddify(float4 as)
 
 
 float4 mainImage(VertData v_in) : TARGET
-{	
+{
 	float2 uv = v_in.uv;
 	float2 pixelSize = pixelUV();
-	
+
 	if (setup_mode) {
 		return setupDraw(uv);
-	} 
-	
-	
+	}
+
+
     float4 r = sampleBlock(red_uv(), pixelSize);
     float4 g = sampleBlock(green_uv(), pixelSize);
     float4 b = sampleBlock(blue_uv(), pixelSize);
-	
+
     float4 orig = image.Sample(textureSampler, v_in.uv);
-    
+
 	//webcam
 	if (!inBox2(uv,always_box())) {
 		return orig;
 	}
-	
+
     if ((isGrey(r) || isWhite(r)) && isBlack(g) && isBlack(b)) //in game
-    {		
+    {
 		float2 perc = invLerp2(top_left_panel(), bot_right_panel(), uv);
         return inGame.Sample(textureSampler, perc);
     } else if (isBlack(r) && isGrey(g) && isGrey(b)) { //title screen
@@ -251,7 +251,7 @@ float4 mainImage(VertData v_in) : TARGET
     } else if (isBlack(r) && isBlack(g) && isBlack(b)) { //credits and pause
         float2 perc = invLerp2(top_left_panel(), bot_right_panel(), uv);
         return credits_pause.Sample(textureSampler, perc);
-    } else if (isBlue(g) && isBlue(b)) {//rocket         
+    } else if (isBlue(g) && isBlue(b)) {//rocket
         float2 perc = invLerp2(top_left_panel(), bot_right_panel(), uv);
         return rocket.Sample(textureSampler, perc);
     } else if (isGrey(r)) { //music
@@ -261,7 +261,7 @@ float4 mainImage(VertData v_in) : TARGET
         float2 perc = invLerp2(top_left_panel(), bot_right_panel(), uv);
         return inGame.Sample(textureSampler, perc);
     }
-    
+
     return image.Sample(textureSampler, uv);
-	
+
 }
